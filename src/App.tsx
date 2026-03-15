@@ -10,18 +10,17 @@ import {
 } from "firebase/firestore"
 
 import SaleModal from "./components/SaleModal"
-import type { Sale } from "./types/Sales"
+import type { Sale, SaleInput } from "./types/Sales"
 
 function App() {
 
   const [sales, setSales] = useState<Sale[]>([])
   const [modalOpen, setModalOpen] = useState(false)
   const [editingSale, setEditingSale] = useState<Sale | null>(null)
-
+  const totalSales = sales.reduce((sum, sale) => sum + sale.total, 0)
   const salesCollection = collection(db, "sales")
 
   async function loadSales() {
-
     const data = await getDocs(salesCollection)
 
     const list: Sale[] = data.docs.map(doc => ({
@@ -36,14 +35,12 @@ function App() {
     loadSales()
   }, [])
 
-  async function createSale(sale: Sale) {
-
+  async function createSale(sale: SaleInput) {
     await addDoc(salesCollection, sale)
-
     loadSales()
   }
 
-  async function updateSale(sale: Sale) {
+  async function updateSale(sale: SaleInput) {
 
     if (!editingSale?.id) return
 
@@ -77,61 +74,120 @@ function App() {
   }
 
   return (
-    <div style={{ padding: 30 }}>
 
-      <h1>🍿 Controle de Pipoca</h1>
+    <div className="min-h-screen bg-gray-100 p-4">
 
-      <button onClick={() => setModalOpen(true)}>
-        Nova venda
-      </button>
+      <div className="max-w-5xl mx-auto">
 
-      <table border={1} cellPadding={10} style={{ marginTop: 20 }}>
+        {/* HEADER */}
+        <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 mb-6">
 
-        <thead>
-          <tr>
-            <th>Sabor</th>
-            <th>Quantidade</th>
-            <th>Valor</th>
-            <th>Ações</th>
-          </tr>
-        </thead>
+          <h1 className="text-2xl font-bold">
+            🍿 Controle de Pipoca
+          </h1>
+          {/* TOTAL DE VENDAS */}
 
-        <tbody>
+          <div className="bg-green-500 text-white p-4 rounded-xl mb-4 shadow">
 
-          {sales.map((sale) => (
+            <p className="text-sm">
+              Total vendido
+            </p>
 
-            <tr key={sale.id}>
+            <p className="text-2xl font-bold">
+              R$ {totalSales.toFixed(2)}
+            </p>
 
-              <td>{sale.flavor}</td>
-              <td>{sale.quantity}</td>
-              <td>R${sale.total}</td>
+          </div>
 
-              <td>
+          <button
+            onClick={() => setModalOpen(true)}
+            className="bg-orange-500 text-white px-4 py-2 rounded-lg hover:bg-orange-600 transition"
+          >
+            Nova venda
+          </button>
 
-                <button
-                  onClick={() => {
-                    setEditingSale(sale)
-                    setModalOpen(true)
-                  }}
+        </div>
+
+
+        {/* TABELA */}
+        <div className="bg-white rounded-xl shadow overflow-x-auto">
+
+          <table className="w-full text-sm">
+
+            <thead className="bg-gray-200 text-left">
+
+              <tr>
+                <th className="p-3">Sabor</th>
+                <th className="p-3">Preço</th>
+                <th className="p-3">Quantidade</th>
+                <th className="p-3">Valor</th>
+                <th className="p-3">Ações</th>
+              </tr>
+
+            </thead>
+
+            <tbody>
+
+              {sales.map((sale) => (
+
+                <tr
+                  key={sale.id}
+                  className="border-t hover:bg-gray-50"
                 >
-                  Editar
-                </button>
 
-                <button
-                  onClick={() => deleteSale(sale.id)}
-                >
-                  Excluir
-                </button>
+                  <td className="p-3 capitalize">
+                    {sale.flavor}
+                  </td>
 
-              </td>
+                  <td className="p-3">
+                    R$ {sale.price}
+                  </td>
 
-            </tr>
+                  <td className="p-3">
+                    {sale.quantity}
+                  </td>
 
-          ))}
+                  <td className="p-3 font-semibold">
+                    R$ {sale.total}
+                  </td>
 
-        </tbody>
+                  <td className="p-3">
 
-      </table>
+                    <div className="flex gap-2 flex-wrap">
+
+                      <button
+                        onClick={() => {
+                          setEditingSale(sale)
+                          setModalOpen(true)
+                        }}
+                        className="bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600"
+                      >
+                        Editar
+                      </button>
+
+                      <button
+                        onClick={() => deleteSale(sale.id)}
+                        className="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600"
+                      >
+                        Excluir
+                      </button>
+
+                    </div>
+
+                  </td>
+
+                </tr>
+
+              ))}
+
+            </tbody>
+
+          </table>
+
+        </div>
+
+      </div>
+
 
       <SaleModal
         isOpen={modalOpen}

@@ -30,39 +30,90 @@ export default function SaleModal({ isOpen, onClose, onSave, editingSale }: Prop
 
     onSave({
       flavor,
+      price: 17,
       quantity,
-      total: quantity * 5
+      total: quantity * 17
     })
 
     onClose()
   }
 
   return (
-    <div style={{ background: "#00000088", position: "fixed", inset: 0 }}>
-      <div style={{ background: "white", padding: 20, margin: "100px auto", width: 300 }}>
 
-        <h3>{editingSale ? "Editar venda" : "Nova venda"}</h3>
+    <div className="fixed inset-0 bg-black/40 flex items-center justify-center p-4">
 
-        <form onSubmit={handleSubmit}>
+      <div className="bg-white w-full max-w-sm rounded-xl shadow-lg p-6">
 
-          <input
-            placeholder="Sabor"
-            value={flavor}
-            onChange={(e) => setFlavor(e.target.value as "chocolate" | "morango" | "ninho")}
-          />
+        <h3 className="text-xl font-bold mb-4">
+          {editingSale ? "Editar venda" : "Nova venda"}
+        </h3>
 
-          <input
-            type="number"
-            placeholder="Quantidade"
-            value={quantity}
-            onChange={(e) => setQuantity(Number(e.target.value))}
-          />
+        <form onSubmit={handleSubmit} className="flex flex-col gap-4">
 
-          <button type="submit">Salvar</button>
-          <button type="button" onClick={onClose}>Cancelar</button>
+          {/* SABOR */}
+          <div className="flex flex-col gap-1">
+
+            <label className="text-sm font-medium">
+              Sabor
+            </label>
+
+            <select
+              className="border rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-orange-400"
+              value={flavor}
+              onChange={(e) =>
+                setFlavor(e.target.value as "chocolate" | "morango" | "ninho")
+              }
+            >
+              <option value="chocolate">🍫 Chocolate</option>
+              <option value="morango">🍓 Morango</option>
+              <option value="ninho">🥛 Ninho</option>
+            </select>
+
+          </div>
+
+
+          {/* QUANTIDADE */}
+          <div className="flex flex-col gap-1">
+
+            <label className="text-sm font-medium">
+              Quantidade
+            </label>
+
+            <input
+              type="number"
+              placeholder="Quantidade"
+              value={quantity}
+              onChange={(e) => setQuantity(Number(e.target.value))}
+              className="border rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-orange-400"
+            />
+
+          </div>
+
+
+          {/* BOTÕES */}
+          <div className="flex gap-3 mt-2">
+
+            <button
+              type="submit"
+              className="flex-1 bg-green-500 text-white py-2 rounded-lg hover:bg-green-600 transition"
+            >
+              Salvar
+            </button>
+
+            <button
+              type="button"
+              onClick={onClose}
+              className="flex-1 bg-gray-400 text-white py-2 rounded-lg hover:bg-gray-500 transition"
+            >
+              Cancelar
+            </button>
+
+          </div>
 
         </form>
+
       </div>
+
     </div>
   )
 }
