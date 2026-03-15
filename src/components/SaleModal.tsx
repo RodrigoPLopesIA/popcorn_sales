@@ -1,25 +1,40 @@
 import { useEffect, useState } from "react"
 import type { Sale } from "../types/Sales"
+import type { User } from "firebase/auth"
 
 interface Props {
+  user: User
   isOpen: boolean
   onClose: () => void
   onSave: (sale: Sale) => void
   editingSale: Sale | null
 }
 
-export default function SaleModal({ isOpen, onClose, onSave, editingSale }: Props) {
+export default function SaleModal({ user, isOpen, onClose, onSave, editingSale }: Props) {
 
   const [flavor, setFlavor] = useState<"chocolate" | "morango" | "ninho">("morango")
   const [quantity, setQuantity] = useState<number>(0)
+  const [date, setDate] = useState("")
+  const [time, setTime] = useState("")
 
   useEffect(() => {
     if (editingSale) {
       setFlavor(editingSale.flavor)
       setQuantity(editingSale.quantity)
+      setDate(editingSale.date)
+      setTime(editingSale.time)
     } else {
       setFlavor("ninho")
       setQuantity(0)
+
+      const now = new Date()
+
+      const localDate = now.toISOString().split("T")[0]
+
+      const localTime = now.toTimeString().slice(0, 5)
+
+      setDate(localDate)
+      setTime(localTime)
     }
   }, [editingSale])
 
@@ -32,7 +47,10 @@ export default function SaleModal({ isOpen, onClose, onSave, editingSale }: Prop
       flavor,
       price: 17,
       quantity,
-      total: quantity * 17
+      total: quantity * 17,
+      user: user?.email?.split("@")[0] as string,
+      date,
+      time
     })
 
     onClose()
@@ -88,7 +106,40 @@ export default function SaleModal({ isOpen, onClose, onSave, editingSale }: Prop
             />
 
           </div>
+          {/* DATA */}
+          <div className="flex flex-col gap-1">
 
+            <label className="text-sm font-medium">
+              Data
+            </label>
+
+            <input
+              type="date"
+              disabled={!editingSale ? true : false}
+              value={date}
+              onChange={(e) => setDate(e.target.value)}
+              className="border rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-orange-400"
+            />
+
+          </div>
+
+
+          {/* HORA */}
+          <div className="flex flex-col gap-1">
+
+            <label className="text-sm font-medium">
+              Hora
+            </label>
+
+            <input
+              disabled={!editingSale ? true : false}
+              type="time"
+              value={time}
+              onChange={(e) => setTime(e.target.value)}
+              className="border rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-orange-400"
+            />
+
+          </div>
 
           {/* BOTÕES */}
           <div className="flex gap-3 mt-2">
