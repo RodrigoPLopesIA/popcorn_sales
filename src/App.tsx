@@ -6,8 +6,7 @@ import {
   getDocs,
   deleteDoc,
   updateDoc,
-  doc,
-  getDoc
+  doc
 } from "firebase/firestore"
 import { onAuthStateChanged, type User } from "firebase/auth"
 import { auth } from "./services/firebase"
@@ -22,7 +21,6 @@ function App() {
   const [sales, setSales] = useState<Sale[]>([])
   const [modalOpen, setModalOpen] = useState(false)
   const [editingSale, setEditingSale] = useState<Sale | null>(null)
-  const [role, setRole] = useState<string | null>(null);
 
   // Paginação
   const [currentPage, setCurrentPage] = useState(1)
