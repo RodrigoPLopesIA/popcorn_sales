@@ -6,8 +6,7 @@ import {
   getDocs,
   deleteDoc,
   updateDoc,
-  doc,
-  getDoc
+  doc
 } from "firebase/firestore"
 import { onAuthStateChanged, type User } from "firebase/auth"
 import { auth } from "./services/firebase"
@@ -32,19 +31,6 @@ function App() {
   const totalPipocas = sales.reduce((sum, sale) => sum + sale.quantity, 0)
 
   const salesCollection = collection(db, "sales")
-
-  useEffect(() => {
-    if (user?.uid) {
-      const fetchRole = async () => {
-        const userDoc = await getDoc(doc(db, "users", user.uid));
-        if (userDoc.exists()) {
-          const data = userDoc.data();
-          setRole(data.role || null);
-        }
-      }
-      fetchRole();
-    }
-  }, [user]);
 
   async function loadSales() {
     const data = await getDocs(salesCollection)
