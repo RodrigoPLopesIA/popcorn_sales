@@ -22,7 +22,6 @@ function App() {
   const [sales, setSales] = useState<Sale[]>([])
   const [modalOpen, setModalOpen] = useState(false)
   const [editingSale, setEditingSale] = useState<Sale | null>(null)
-  const [role, setRole] = useState<string | null>(null);
 
   // Paginação
   const [currentPage, setCurrentPage] = useState(1)
