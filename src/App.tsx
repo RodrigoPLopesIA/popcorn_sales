@@ -22,6 +22,7 @@ function App() {
   const [sales, setSales] = useState<Sale[]>([])
   const [modalOpen, setModalOpen] = useState(false)
   const [editingSale, setEditingSale] = useState<Sale | null>(null)
+  const [role, setRole] = useState<string | null>(null);
 
   // Paginação
   const [currentPage, setCurrentPage] = useState(1)
@@ -32,19 +33,6 @@ function App() {
   const totalPipocas = sales.reduce((sum, sale) => sum + sale.quantity, 0)
 
   const salesCollection = collection(db, "sales")
-
-  useEffect(() => {
-    if (user?.uid) {
-      const fetchRole = async () => {
-        const userDoc = await getDoc(doc(db, "users", user.uid));
-        if (userDoc.exists()) {
-          const data = userDoc.data();
-          setRole(data.role || null);
-        }
-      }
-      fetchRole();
-    }
-  }, [user]);
 
   async function loadSales() {
     const data = await getDocs(salesCollection)
