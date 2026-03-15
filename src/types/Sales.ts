@@ -4,6 +4,9 @@ export interface Sale {
   price: number
   quantity: number
   total: number
+  user: string
+  date: string
+  time: string
 }
 
-export type SaleInput = Omit<Sale, "id">
+export type SaleInput = Omit<Sale, "id" | "user" | "date" | "time">
