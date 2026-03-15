@@ -72,16 +72,22 @@ function App() {
   }
 
   async function updateSale(sale: SaleInput) {
-    if (!editingSale?.id) return
-    const saleDoc = doc(db, "sales", editingSale.id)
-    await updateDoc(saleDoc, {
-      ...sale,
-      user: editingSale.user,
-      date: editingSale.date,
-      time: editingSale.time
-    })
-    setEditingSale(null)
-    loadSales()
+    console.log(`-------- Sale: ${JSON.stringify(sale)}`)
+    try {
+      if (!user?.email) return
+      const username = user.email.split("@")[0].split(".")[0]
+      if (!editingSale?.id) return
+      const saleDoc = doc(db, "sales", editingSale.id)
+       console.log(`-------- Sale id: ${editingSale.id}`)
+      await updateDoc(saleDoc, {
+        ...sale,
+        user: username,
+      })
+      setEditingSale(null)
+      loadSales()
+    } catch (error) {
+      console.log(error)
+    }
   }
 
   async function deleteSale(id?: string) {

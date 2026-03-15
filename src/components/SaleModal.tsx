@@ -17,26 +17,33 @@ export default function SaleModal({ user, isOpen, onClose, onSave, editingSale }
   const [date, setDate] = useState("")
   const [time, setTime] = useState("")
 
+  function formatDateForInput(dateStr: string) {
+    const [day, month, year] = dateStr.split("/")
+    return `${year}-${month}-${day}`  // YYYY-MM-DD
+  }
+
+  function formatDateForSave(dateStr: string) {
+    const [year, month, day] = dateStr.split("-")
+    return `${day}/${month}/${year}`  // DD/MM/YYYY
+  }
   useEffect(() => {
-    if (editingSale) {
-      setFlavor(editingSale.flavor)
-      setQuantity(editingSale.quantity)
-      setDate(editingSale.date)
-      setTime(editingSale.time)
-    } else {
-      setFlavor("ninho")
-      setQuantity(0)
+    if (isOpen) {
+      if (editingSale) {
+        setFlavor(editingSale.flavor)
+        setQuantity(editingSale.quantity)
 
-      const now = new Date()
-
-      const localDate = now.toISOString().split("T")[0]
-
-      const localTime = now.toTimeString().slice(0, 5)
-
-      setDate(localDate)
-      setTime(localTime)
+        setDate(formatDateForInput(editingSale.date))
+        console.log(`formated date: ${date}`)
+        setTime(editingSale.time.slice(0, 5))
+      } else {
+        const now = new Date()
+        setDate(now.toISOString().split("T")[0])
+        setTime(now.toTimeString().slice(0, 5))
+        setFlavor("ninho")
+        setQuantity(0)
+      }
     }
-  }, [editingSale])
+  }, [isOpen, editingSale])
 
   if (!isOpen) return null
 
@@ -49,7 +56,7 @@ export default function SaleModal({ user, isOpen, onClose, onSave, editingSale }
       quantity,
       total: quantity * 17,
       user: user?.email?.split("@")[0] as string,
-      date,
+      date: formatDateForSave(date),
       time
     })
 
@@ -106,40 +113,19 @@ export default function SaleModal({ user, isOpen, onClose, onSave, editingSale }
             />
 
           </div>
-          {/* DATA */}
-          <div className="flex flex-col gap-1">
+          <input
+            type="date"
+            value={date}
+            onChange={(e) => setDate(e.target.value)}
+            className="border rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-orange-400"
+          />
 
-            <label className="text-sm font-medium">
-              Data
-            </label>
-
-            <input
-              type="date"
-              disabled={!editingSale ? true : false}
-              value={date}
-              onChange={(e) => setDate(e.target.value)}
-              className="border rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-orange-400"
-            />
-
-          </div>
-
-
-          {/* HORA */}
-          <div className="flex flex-col gap-1">
-
-            <label className="text-sm font-medium">
-              Hora
-            </label>
-
-            <input
-              disabled={!editingSale ? true : false}
-              type="time"
-              value={time}
-              onChange={(e) => setTime(e.target.value)}
-              className="border rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-orange-400"
-            />
-
-          </div>
+          <input
+            type="time"
+            value={time}
+            onChange={(e) => setTime(e.target.value)}
+            className="border rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-orange-400"
+          />
 
           {/* BOTÕES */}
           <div className="flex gap-3 mt-2">
