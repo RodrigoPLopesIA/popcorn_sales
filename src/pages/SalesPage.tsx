@@ -60,6 +60,18 @@ function SalesPage() {
     })
     .reduce((sum, sale) => sum + sale.total, 0)
 
+  const totalPipocasByPeriod = sales
+    .filter((sale) => {
+      if (!startDate && !endDate) return false
+
+      const saleDate = parseDate(sale.date)
+      const matchesStart = startDate ? saleDate >= new Date(startDate) : true
+      const matchesEnd = endDate ? saleDate <= new Date(endDate) : true
+
+      return matchesStart && matchesEnd
+    })
+    .reduce((sum, sale) => sum + sale.quantity, 0)
+
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
       setUser(user)
@@ -159,10 +171,13 @@ function SalesPage() {
       return dateB.getTime() - dateA.getTime()
     })
 
-  const totalPages = Math.ceil(filteredSales.length / itemsPerPage)
-  const currentSales = filteredSales.slice(indexOfFirstItem, indexOfLastItem)
 
   const today = new Date().toLocaleDateString("pt-BR")
+  const totalPipocasToday = sales
+    .filter(sale => sale.date === today)
+    .reduce((sum, sale) => sum + sale.quantity, 0)
+  const totalPages = Math.ceil(filteredSales.length / itemsPerPage)
+  const currentSales = filteredSales.slice(indexOfFirstItem, indexOfLastItem)
 
   const totalToday = sales
     .filter(sale => sale.date === today)
@@ -188,14 +203,32 @@ function SalesPage() {
           <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
             <div className="bg-pink-500 text-white p-3 rounded-xl">
               <p className="text-sm">Período</p>
-              <p className="text-xl font-bold">
-                {startDate || endDate ? `R$ ${totalByPeriod.toFixed(2)}` : "—"}
-              </p>
+
+              {startDate || endDate ? (
+                <div className="flex justify-between items-center">
+                  <p className="text-xl font-bold">
+                    R$ {totalByPeriod.toFixed(2)}
+                  </p>
+                  <p className="text-sm">
+                    🍿 {totalPipocasByPeriod}
+                  </p>
+                </div>
+              ) : (
+                <p className="text-xl font-bold">—</p>
+              )}
             </div>
+
 
             <div className="bg-pink-400 text-white p-3 rounded-xl">
               <p className="text-sm">Hoje</p>
-              <p className="text-xl font-bold">R$ {totalToday.toFixed(2)}</p>
+              <div className="flex justify-between items-center">
+                <p className="text-xl font-bold">
+                  R$ {totalToday.toFixed(2)}
+                </p>
+                <p className="text-sm">
+                  🍿 {totalPipocasToday}
+                </p>
+              </div>
             </div>
 
             <div className="bg-pink-600 text-white p-3 rounded-xl">
@@ -329,8 +362,8 @@ function SalesPage() {
               key={i}
               onClick={() => setCurrentPage(i + 1)}
               className={`px-3 py-1 rounded ${currentPage === i + 1
-                  ? 'bg-pink-500 text-white'
-                  : 'bg-pink-100 text-pink-700'
+                ? 'bg-pink-500 text-white'
+                : 'bg-pink-100 text-pink-700'
                 }`}
             >
               {i + 1}
