@@ -12,7 +12,7 @@ interface Props {
 
 export default function SaleModal({ user, isOpen, onClose, onSave, editingSale }: Props) {
 
-  const [flavor, setFlavor] = useState<"chocolate" | "morango" | "ninho">("morango")
+  const [flavor, setFlavor] = useState<"chocolate" | "morango" | "ninho" | "pistache" | "ovo_maltine" >("morango")
   const [quantity, setQuantity] = useState<number>(0)
   const [date, setDate] = useState("")
   const [time, setTime] = useState("")
@@ -86,12 +86,14 @@ export default function SaleModal({ user, isOpen, onClose, onSave, editingSale }
               className="border rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-orange-400"
               value={flavor}
               onChange={(e) =>
-                setFlavor(e.target.value as "chocolate" | "morango" | "ninho")
+                setFlavor(e.target.value as "chocolate" | "morango" | "ninho" | "pistache" | "ovo_maltine")
               }
             >
               <option value="chocolate">🍫 Chocolate</option>
               <option value="morango">🍓 Morango</option>
               <option value="ninho">🥛 Ninho</option>
+              <option value="pistache">🌰 Pistache</option>
+              <option value="ovo_maltine">🍫 Ovo Maltine</option>
             </select>
 
           </div>

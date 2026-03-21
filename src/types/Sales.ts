@@ -1,6 +1,6 @@
 export interface Sale {
   id?: string
-  flavor: "chocolate" | "morango" | "ninho"
+  flavor:"chocolate" | "morango" | "ninho" | "pistache" | "ovo_maltine" | "pistache" | "ovo_maltine"
   price: number
   quantity: number
   total: number
