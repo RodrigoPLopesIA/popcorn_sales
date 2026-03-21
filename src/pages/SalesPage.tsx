@@ -14,7 +14,6 @@ import Login from "./Login"
 import SaleModal from "../components/SaleModal"
 import type { Sale, SaleInput } from "../types/Sales"
 
-
 function SalesPage() {
   const [user, setUser] = useState<User | null>(null)
   const [loadingAuth, setLoadingAuth] = useState(true)
@@ -25,11 +24,9 @@ function SalesPage() {
   const [startDate, setStartDate] = useState("")
   const [endDate, setEndDate] = useState("")
 
-  // Paginação
   const [currentPage, setCurrentPage] = useState(1)
   const itemsPerPage = 5
 
-  // Cálculos
   const totalSalesValue = sales.reduce((sum, sale) => sum + sale.total, 0)
   const totalPipocas = sales.reduce((sum, sale) => sum + sale.quantity, 0)
 
@@ -38,25 +35,31 @@ function SalesPage() {
   async function loadSales() {
     const data = await getDocs(salesCollection)
 
-    let list: Sale[] = data.docs.map(doc => ({
+    const list: Sale[] = data.docs.map(doc => ({
       id: doc.id,
       ...(doc.data() as Omit<Sale, "id">)
     }))
 
     setSales(list)
   }
+
+  function parseDate(dateStr: string) {
+    const [day, month, year] = dateStr.split("/")
+    return new Date(`${year}-${month}-${day}`)
+  }
+
   const totalByPeriod = sales
     .filter((sale) => {
       if (!startDate && !endDate) return false
 
       const saleDate = parseDate(sale.date)
-
       const matchesStart = startDate ? saleDate >= new Date(startDate) : true
       const matchesEnd = endDate ? saleDate <= new Date(endDate) : true
 
       return matchesStart && matchesEnd
     })
     .reduce((sum, sale) => sum + sale.total, 0)
+
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
       setUser(user)
@@ -77,7 +80,7 @@ function SalesPage() {
     const time = now.toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" })
     const username = user.email.split("@")[0].split(".")[0]
 
-    const price = sale.price ?? 17 // 👈 valor padrão
+    const price = sale.price ?? 17
     const total = price * sale.quantity
 
     await addDoc(salesCollection, {
@@ -130,13 +133,8 @@ function SalesPage() {
     else createSale(sale)
   }
 
-  // Paginação
   const indexOfLastItem = currentPage * itemsPerPage
   const indexOfFirstItem = indexOfLastItem - itemsPerPage
-  function parseDate(dateStr: string) {
-    const [day, month, year] = dateStr.split("/")
-    return new Date(`${year}-${month}-${day}`)
-  }
 
   const filteredSales = sales
     .filter((sale) => {
@@ -158,142 +156,130 @@ function SalesPage() {
     .sort((a, b) => {
       const dateA = new Date(`${parseDate(a.date)} ${a.time}`)
       const dateB = new Date(`${parseDate(b.date)} ${b.time}`)
-      return dateB.getTime() - dateA.getTime() // mais recente primeiro
+      return dateB.getTime() - dateA.getTime()
     })
-  const totalPages = Math.ceil(filteredSales.length / itemsPerPage)
 
+  const totalPages = Math.ceil(filteredSales.length / itemsPerPage)
   const currentSales = filteredSales.slice(indexOfFirstItem, indexOfLastItem)
+
   const today = new Date().toLocaleDateString("pt-BR")
 
   const totalToday = sales
     .filter(sale => sale.date === today)
     .reduce((sum, sale) => sum + sale.total, 0)
 
-  if (loadingAuth) return (
-    <div className="flex items-center justify-center min-h-screen">
-      <p>Carregando...</p>
-    </div>
-  )
+  if (loadingAuth) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <p>Carregando...</p>
+      </div>
+    )
+  }
 
   if (!user) return <Login />
 
   return (
-    <div className="min-h-screen bg-gray-100 p-4">
+    <div className="min-h-screen bg-gray-100 p-2 sm:p-4">
       <div className="max-w-5xl mx-auto">
 
         {/* HEADER */}
-        <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 mb-6">
-          <div className="flex gap-4">
-            <div className="bg-purple-500 text-white p-4 rounded-xl shadow">
-              <p className="text-sm">Vendido no período</p>
-              <p className="text-2xl font-bold">
+        <div className="flex flex-col gap-4 mb-6">
+
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+            <div className="bg-purple-500 text-white p-3 rounded-xl">
+              <p className="text-sm">Período</p>
+              <p className="text-xl font-bold">
                 {startDate || endDate ? `R$ ${totalByPeriod.toFixed(2)}` : "—"}
               </p>
             </div>
-            <div className="bg-blue-500 text-white p-4 rounded-xl shadow">
-              <p className="text-sm">Vendido hoje</p>
-              <p className="text-2xl font-bold">R$ {totalToday.toFixed(2)}</p>
+
+            <div className="bg-blue-500 text-white p-3 rounded-xl">
+              <p className="text-sm">Hoje</p>
+              <p className="text-xl font-bold">R$ {totalToday.toFixed(2)}</p>
             </div>
-            <div className="bg-green-500 text-white p-4 rounded-xl shadow">
-              <p className="text-sm">Total vendido</p>
-              <p className="text-2xl font-bold">R$ {totalSalesValue.toFixed(2)}</p>
+
+            <div className="bg-green-500 text-white p-3 rounded-xl">
+              <p className="text-sm">Total</p>
+              <p className="text-xl font-bold">R$ {totalSalesValue.toFixed(2)}</p>
             </div>
-            <div className="bg-yellow-400 text-white p-4 rounded-xl shadow">
-              <p className="text-sm">Total de pipocas</p>
-              <p className="text-2xl font-bold">{totalPipocas}</p>
+
+            <div className="bg-yellow-400 text-white p-3 rounded-xl">
+              <p className="text-sm">Pipocas</p>
+              <p className="text-xl font-bold">{totalPipocas}</p>
             </div>
           </div>
 
-          <div className="flex gap-2">
-            <button
-              onClick={() => setModalOpen(true)}
-              className="bg-orange-500 text-white px-4 py-2 rounded-lg hover:bg-orange-600 transition"
-            >
-              Nova venda
-            </button>
-          </div>
+          <button
+            onClick={() => setModalOpen(true)}
+            className="w-full sm:w-auto bg-orange-500 text-white py-2 rounded-lg"
+          >
+            Nova venda
+          </button>
         </div>
-        <div className="bg-white p-4 rounded-xl shadow mb-4 flex flex-col md:flex-row gap-3">
+
+        {/* FILTROS */}
+        <div className="bg-white p-4 rounded-xl shadow mb-4 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3">
           <input
             type="text"
             placeholder="Buscar..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="border p-2 rounded w-full"
-          />
-
-          <input
-            type="date"
-            value={startDate}
-            onChange={(e) => setStartDate(e.target.value)}
             className="border p-2 rounded"
           />
 
-          <input
-            type="date"
-            value={endDate}
-            onChange={(e) => setEndDate(e.target.value)}
-            className="border p-2 rounded"
-          />
-          <button
-            onClick={clearFilters}
-            className="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600"
-          >
+          <input type="date" value={startDate} onChange={(e) => setStartDate(e.target.value)} className="border p-2 rounded" />
+          <input type="date" value={endDate} onChange={(e) => setEndDate(e.target.value)} className="border p-2 rounded" />
+
+          <button onClick={clearFilters} className="bg-gray-500 text-white rounded">
             Limpar
           </button>
         </div>
-        {/* TABELA */}
-        <div className="bg-white rounded-xl shadow overflow-x-auto">
-          <table className="w-full text-sm">
-            <thead className="bg-gray-200 text-left">
-              <tr>
-                <th className="p-3">Usuário</th>
-                <th className="p-3">Data</th>
-                <th className="p-3">Hora</th>
-                <th className="p-3">Sabor</th>
-                <th className="p-3">Preço</th>
-                <th className="p-3">Quantidade</th>
-                <th className="p-3">Valor</th>
-                <th className="p-3">Ações</th>
-              </tr>
-            </thead>
-            <tbody>
-              {currentSales.map((sale) => (
-                <tr key={sale.id} className="border-t hover:bg-gray-50">
-                  <td className="p-3">{sale.user}</td>
-                  <td className="p-3">{sale.date}</td>
-                  <td className="p-3">{sale.time}</td>
-                  <td className="p-3 capitalize">{sale.flavor}</td>
-                  <td className="p-3">R$ {sale.price}</td>
-                  <td className="p-3">{sale.quantity}</td>
-                  <td className="p-3 font-semibold">R$ {sale.total}</td>
-                  <td className="p-3">
-                    <div className="flex gap-2 flex-wrap">
-                      <button
-                        onClick={() => {
-                          setEditingSale(sale)
-                          setModalOpen(true)
-                        }}
-                        className="bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600"
-                      >
-                        Editar
-                      </button>
-                      <button
-                        onClick={() => deleteSale(sale.id)}
-                        className="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600"
-                      >
-                        Excluir
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+
+        {/* LISTA */}
+        <div className="bg-white rounded-xl shadow p-3">
+          {currentSales.map((sale) => (
+            <div key={sale.id} className="border-b py-3 flex flex-col gap-2">
+
+              <div className="flex justify-between">
+                <span className="font-semibold">{sale.flavor}</span>
+                <span className="font-bold">R$ {sale.total}</span>
+              </div>
+
+              <div className="text-sm text-gray-600 flex justify-between">
+                <span>{sale.date} {sale.time}</span>
+                <span>{sale.user}</span>
+              </div>
+
+              <div className="text-sm flex justify-between">
+                <span>Qtd: {sale.quantity}</span>
+                <span>R$ {sale.price}</span>
+              </div>
+
+              <div className="flex gap-2">
+                <button
+                  onClick={() => {
+                    setEditingSale(sale)
+                    setModalOpen(true)
+                  }}
+                  className="flex-1 bg-blue-500 text-white py-1 rounded"
+                >
+                  Editar
+                </button>
+
+                <button
+                  onClick={() => deleteSale(sale.id)}
+                  className="flex-1 bg-red-500 text-white py-1 rounded"
+                >
+                  Excluir
+                </button>
+              </div>
+
+            </div>
+          ))}
         </div>
 
         {/* PAGINAÇÃO */}
-        <div className="flex justify-center mt-4 gap-2">
+        <div className="flex flex-wrap justify-center mt-4 gap-2">
           {Array.from({ length: totalPages }, (_, i) => (
             <button
               key={i}
@@ -304,6 +290,7 @@ function SalesPage() {
             </button>
           ))}
         </div>
+
       </div>
 
       <SaleModal

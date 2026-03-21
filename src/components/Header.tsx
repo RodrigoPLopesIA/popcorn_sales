@@ -8,6 +8,7 @@ function Header() {
   const navigate = useNavigate()
   const location = useLocation()
   const [user, setUser] = useState<User | null>(null)
+  const [menuOpen, setMenuOpen] = useState(false)
 
   useEffect(() => {
     const unsubscribe = auth.onAuthStateChanged((u) => {
@@ -27,24 +28,23 @@ function Header() {
 
   const isActive = (path: string) =>
     location.pathname === path
-      ? "text-blue-600 border-b-2 border-blue-600"
+      ? "text-blue-600 font-semibold"
       : "text-gray-600 hover:text-blue-500"
 
   return (
-    <div className="bg-white shadow mb-6">
-      <div className="max-w-6xl mx-auto p-4 flex justify-between items-center">
+    <div className="bg-white shadow mb-4">
+      <div className="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between">
 
-        {/* Logo */}
+        {/* LOGO */}
         <h1
           onClick={() => navigate("/")}
-          className="text-xl font-bold cursor-pointer"
+          className="text-lg sm:text-xl font-bold cursor-pointer"
         >
-          🍿  Controle de Pipoca
+          🍿 Pipoca
         </h1>
 
-        {/* Navegação estilo link */}
-        <div className="flex items-center gap-6">
-
+        {/* MENU DESKTOP */}
+        <div className="hidden md:flex items-center gap-6">
           <span
             onClick={() => navigate("/")}
             className={`cursor-pointer ${isActive("/")}`}
@@ -58,12 +58,10 @@ function Header() {
           >
             Dashboard
           </span>
-
         </div>
 
-        {/* Usuário + logout */}
-        <div className="flex items-center gap-4">
-
+        {/* USER + LOGOUT (DESKTOP) */}
+        <div className="hidden md:flex items-center gap-4">
           {user && (
             <span className="text-sm text-gray-600">
               👤 {getUsername(user.email)}
@@ -77,7 +75,54 @@ function Header() {
             Sair
           </span>
         </div>
+
+        {/* BOTÃO MOBILE */}
+        <button
+          onClick={() => setMenuOpen(!menuOpen)}
+          className="md:hidden text-2xl"
+        >
+          ☰
+        </button>
       </div>
+
+      {/* MENU MOBILE */}
+      {menuOpen && (
+        <div className="md:hidden px-4 pb-4 flex flex-col gap-3 border-t">
+
+          <span
+            onClick={() => {
+              navigate("/")
+              setMenuOpen(false)
+            }}
+            className={`cursor-pointer ${isActive("/")}`}
+          >
+            Vendas
+          </span>
+
+          <span
+            onClick={() => {
+              navigate("/dashboard")
+              setMenuOpen(false)
+            }}
+            className={`cursor-pointer ${isActive("/dashboard")}`}
+          >
+            Dashboard
+          </span>
+
+          {user && (
+            <span className="text-sm text-gray-600 mt-2">
+              👤 {getUsername(user.email)}
+            </span>
+          )}
+
+          <span
+            onClick={handleLogout}
+            className="cursor-pointer text-red-500 text-sm"
+          >
+            Sair
+          </span>
+        </div>
+      )}
     </div>
   )
 }
