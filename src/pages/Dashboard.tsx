@@ -45,10 +45,10 @@ function Dashboard() {
             if (!acc[sale.date]) {
                 acc[sale.date] = {
                     date: sale.date,
-                    total: 0
+                    total: 0,
+                    totalQuantity: 0 // 👈 NOVO
                 }
 
-                // inicializa todos sabores com 0
                 allFlavors.forEach(flavor => {
                     acc[sale.date][flavor] = 0
                 })
@@ -56,16 +56,11 @@ function Dashboard() {
 
             acc[sale.date][sale.flavor] += sale.quantity
             acc[sale.date].total += sale.total
+            acc[sale.date].totalQuantity += sale.quantity // 👈 NOVO
 
             return acc
         }, {})
-    ).sort((a: any, b: any) => {
-        const parse = (d: string) => {
-            const [day, month, year] = d.split("/")
-            return new Date(`${year}-${month}-${day}`).getTime()
-        }
-        return parse(b.date) - parse(a.date)
-    })
+    )
     function formatWithDay(dateStr: string) {
         const [day, month, year] = dateStr.split("/")
         const date = new Date(`${year}-${month}-${day}`)
@@ -167,6 +162,7 @@ function Dashboard() {
                                         </th>
                                     ))}
 
+                                    <th className="p-2 text-left">Total pipocas</th>
                                     <th className="p-2 text-left">Total</th>
                                 </tr>
                             </thead>
@@ -188,7 +184,12 @@ function Dashboard() {
                                             </td>
                                         ))}
 
-                                        {/* Total */}
+                                        {/* Quantidade total */}
+                                        <td className="p-2 font-semibold">
+                                            {day.totalQuantity}
+                                        </td>
+
+                                        {/* Total em dinheiro */}
                                         <td className="p-2 font-semibold whitespace-nowrap">
                                             R$ {day.total.toFixed(2)}
                                         </td>
