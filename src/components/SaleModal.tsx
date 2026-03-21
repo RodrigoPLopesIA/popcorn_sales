@@ -13,7 +13,7 @@ interface Props {
 export default function SaleModal({ user, isOpen, onClose, onSave, editingSale }: Props) {
 
   const [flavor, setFlavor] = useState<"chocolate" | "morango" | "ninho" | "pistache" | "ovo_maltine">("morango")
-  const [quantity, setQuantity] = useState<number>(0)
+  const [quantity, setQuantity] = useState<number>(1)
   const [price, setPrice] = useState(editingSale?.price || 17)
   const [date, setDate] = useState("")
   const [time, setTime] = useState("")
@@ -42,7 +42,7 @@ export default function SaleModal({ user, isOpen, onClose, onSave, editingSale }
         setTime(now.toTimeString().slice(0, 5))
         setPrice(17)
         setFlavor("ninho")
-        setQuantity(0)
+        setQuantity(1)
       }
     }
   }, [isOpen, editingSale])
@@ -123,6 +123,7 @@ export default function SaleModal({ user, isOpen, onClose, onSave, editingSale }
               type="number"
               placeholder="Quantidade"
               value={quantity}
+              min={1}
               onChange={(e) => setQuantity(Number(e.target.value))}
               className="border rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-orange-400"
             />
