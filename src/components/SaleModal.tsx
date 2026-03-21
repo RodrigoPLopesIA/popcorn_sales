@@ -52,6 +52,11 @@ export default function SaleModal({ user, isOpen, onClose, onSave, editingSale }
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
 
+    if (quantity <= 0){
+      alert("O valor de quantidade deve ser maior que 0.")
+      return 
+    } 
+
     onSave({
       flavor,
       quantity,
