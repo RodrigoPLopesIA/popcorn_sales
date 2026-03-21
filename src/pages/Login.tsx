@@ -60,7 +60,7 @@ export default function Login() {
 
         <button
           type="submit"
-          className="bg-orange-500 text-white w-full p-2 rounded hover:bg-orange-600"
+          className="bg-pink-500 text-white w-full p-2 rounded bg-pink-400"
         >
           Entrar
         </button>
