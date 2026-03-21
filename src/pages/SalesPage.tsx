@@ -228,13 +228,13 @@ function SalesPage() {
           </button>
         </div>
 
-        {/* LISTA */}
-        <div className="bg-white rounded-xl shadow p-3">
+        {/* LISTA MOBILE (cards) */}
+        <div className="bg-white rounded-xl shadow p-3 lg:hidden">
           {currentSales.map((sale) => (
             <div key={sale.id} className="border-b py-3 flex flex-col gap-2">
 
               <div className="flex justify-between">
-                <span className="font-semibold">{sale.flavor}</span>
+                <span className="font-semibold capitalize">{sale.flavor}</span>
                 <span className="font-bold">R$ {sale.total}</span>
               </div>
 
@@ -271,17 +271,67 @@ function SalesPage() {
           ))}
         </div>
 
+        {/* LISTA DESKTOP (tabela) */}
+        <div className="hidden lg:block bg-white rounded-xl shadow overflow-x-auto">
+          <table className="w-full text-sm">
+            <thead className="bg-pink-100 text-left">
+              <tr>
+                <th className="p-3">Usuário</th>
+                <th className="p-3">Data</th>
+                <th className="p-3">Hora</th>
+                <th className="p-3">Sabor</th>
+                <th className="p-3">Preço</th>
+                <th className="p-3">Quantidade</th>
+                <th className="p-3">Valor</th>
+                <th className="p-3">Ações</th>
+              </tr>
+            </thead>
+            <tbody>
+              {currentSales.map((sale) => (
+                <tr key={sale.id} className="border-t hover:bg-pink-50">
+                  <td className="p-3">{sale.user}</td>
+                  <td className="p-3">{sale.date}</td>
+                  <td className="p-3">{sale.time}</td>
+                  <td className="p-3 capitalize">{sale.flavor}</td>
+                  <td className="p-3">R$ {sale.price}</td>
+                  <td className="p-3">{sale.quantity}</td>
+                  <td className="p-3 font-semibold">R$ {sale.total}</td>
+                  <td className="p-3">
+                    <div className="flex gap-2">
+                      <button
+                        onClick={() => {
+                          setEditingSale(sale)
+                          setModalOpen(true)
+                        }}
+                        className="bg-pink-500 hover:bg-pink-600 text-white px-3 py-1 rounded"
+                      >
+                        Editar
+                      </button>
+
+                      <button
+                        onClick={() => deleteSale(sale.id)}
+                        className="bg-pink-200 hover:bg-pink-300 text-pink-700 px-3 py-1 rounded"
+                      >
+                        Excluir
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+
         {/* PAGINAÇÃO */}
         <div className="flex flex-wrap justify-center mt-4 gap-2">
           {Array.from({ length: totalPages }, (_, i) => (
             <button
               key={i}
               onClick={() => setCurrentPage(i + 1)}
-              className={`px-3 py-1 rounded ${
-                currentPage === i + 1
+              className={`px-3 py-1 rounded ${currentPage === i + 1
                   ? 'bg-pink-500 text-white'
                   : 'bg-pink-100 text-pink-700'
-              }`}
+                }`}
             >
               {i + 1}
             </button>
