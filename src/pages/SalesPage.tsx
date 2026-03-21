@@ -71,37 +71,45 @@ function SalesPage() {
 
   async function createSale(sale: SaleInput) {
     if (!user?.email) return
+
     const now = new Date()
     const date = now.toLocaleDateString("pt-BR")
     const time = now.toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" })
     const username = user.email.split("@")[0].split(".")[0]
 
+    const price = sale.price ?? 17 // 👈 valor padrão
+    const total = price * sale.quantity
+
     await addDoc(salesCollection, {
       ...sale,
+      price,
+      total,
       user: username,
       date,
       time
     })
+
     loadSales()
   }
 
   async function updateSale(sale: SaleInput) {
-    console.log(`-------- Sale: ${JSON.stringify(sale)}`)
-    try {
-      if (!user?.email) return
-      const username = user.email.split("@")[0].split(".")[0]
-      if (!editingSale?.id) return
-      const saleDoc = doc(db, "sales", editingSale.id)
-      console.log(`-------- Sale id: ${editingSale.id}`)
-      await updateDoc(saleDoc, {
-        ...sale,
-        user: username,
-      })
-      setEditingSale(null)
-      loadSales()
-    } catch (error) {
-      console.log(error)
-    }
+    if (!user?.email || !editingSale?.id) return
+
+    const username = user.email.split("@")[0].split(".")[0]
+    const saleDoc = doc(db, "sales", editingSale.id)
+
+    const price = sale.price ?? 17
+    const total = price * sale.quantity
+
+    await updateDoc(saleDoc, {
+      ...sale,
+      price,
+      total,
+      user: username,
+    })
+
+    setEditingSale(null)
+    loadSales()
   }
 
   async function deleteSale(id?: string) {

@@ -12,8 +12,9 @@ interface Props {
 
 export default function SaleModal({ user, isOpen, onClose, onSave, editingSale }: Props) {
 
-  const [flavor, setFlavor] = useState<"chocolate" | "morango" | "ninho" | "pistache" | "ovo_maltine" >("morango")
+  const [flavor, setFlavor] = useState<"chocolate" | "morango" | "ninho" | "pistache" | "ovo_maltine">("morango")
   const [quantity, setQuantity] = useState<number>(0)
+  const [price, setPrice] = useState(editingSale?.price || 17)
   const [date, setDate] = useState("")
   const [time, setTime] = useState("")
 
@@ -31,14 +32,15 @@ export default function SaleModal({ user, isOpen, onClose, onSave, editingSale }
       if (editingSale) {
         setFlavor(editingSale.flavor)
         setQuantity(editingSale.quantity)
-
+        setPrice(editingSale.price)
         setDate(formatDateForInput(editingSale.date))
-        console.log(`formated date: ${date}`)
         setTime(editingSale.time.slice(0, 5))
+
       } else {
         const now = new Date()
         setDate(now.toISOString().split("T")[0])
         setTime(now.toTimeString().slice(0, 5))
+        setPrice(17)
         setFlavor("ninho")
         setQuantity(0)
       }
@@ -52,9 +54,9 @@ export default function SaleModal({ user, isOpen, onClose, onSave, editingSale }
 
     onSave({
       flavor,
-      price: 17,
       quantity,
-      total: quantity * 17,
+      price,
+      total: quantity * price,
       user: user?.email?.split("@")[0] as string,
       date: formatDateForSave(date),
       time
@@ -97,7 +99,18 @@ export default function SaleModal({ user, isOpen, onClose, onSave, editingSale }
             </select>
 
           </div>
+          <div className="flex flex-col gap-1">
+            <label className="text-sm font-medium">
+              Preço (R$)
+            </label>
 
+            <input
+              type="number"
+              value={price}
+              onChange={(e) => setPrice(Number(e.target.value))}
+              className="border rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-orange-400"
+            />
+          </div>
 
           {/* QUANTIDADE */}
           <div className="flex flex-col gap-1">
