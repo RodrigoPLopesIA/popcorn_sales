@@ -4,6 +4,7 @@ import Sales from "../pages/SalesPage"
 import Login from "../pages/Login"
 import Header from "../components/Header"
 import ProtectedRoutes from "./ProtectedRoutes"
+import ProductsPage from "../pages/ProductsPage"
 
 export default function AppRoutes() {
   return (
@@ -31,6 +32,17 @@ export default function AppRoutes() {
               <>
                 <Header />
                 <Dashboard />
+              </>
+            </ProtectedRoutes>
+          }
+        />
+        <Route
+          path="/products"
+          element={
+            <ProtectedRoutes>
+              <>
+                <Header />
+                <ProductsPage />
               </>
             </ProtectedRoutes>
           }

@@ -51,6 +51,12 @@ function Header() {
           >
             Vendas
           </span>
+          <span
+            onClick={() => navigate("/products")}
+            className={`cursor-pointer ${isActive("/products")}`}
+          >
+            Pipocas
+          </span>
 
           <span
             onClick={() => navigate("/dashboard")}
@@ -97,6 +103,12 @@ function Header() {
             className={`cursor-pointer ${isActive("/")}`}
           >
             Vendas
+          </span>
+          <span
+            onClick={() => navigate("/products")}
+            className={`cursor-pointer ${isActive("/products")}`}
+          >
+            Pipocas
           </span>
 
           <span
