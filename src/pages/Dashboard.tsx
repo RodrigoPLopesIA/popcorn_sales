@@ -75,22 +75,6 @@ function Dashboard() {
         setSales(list)
     }
 
-    // 📊 Últimos 7 dias
-    const last7Days = [...Array(7)].map((_, i) => {
-        const d = new Date()
-        d.setDate(d.getDate() - i)
-
-        const formatted = d.toLocaleDateString("pt-BR")
-
-        const total = sales
-            .filter(sale => sale.date === formatted)
-            .reduce((sum, sale) => sum + sale.total, 0)
-
-        return {
-            date: formatted,
-            total
-        }
-    }).reverse()
 
     // 🏆 Ranking vendedores
     const ranking = Object.values(
