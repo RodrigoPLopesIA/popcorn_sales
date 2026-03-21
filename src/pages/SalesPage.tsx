@@ -186,24 +186,24 @@ function SalesPage() {
         <div className="flex flex-col gap-4 mb-6">
 
           <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-            <div className="bg-purple-500 text-white p-3 rounded-xl">
+            <div className="bg-pink-500 text-white p-3 rounded-xl">
               <p className="text-sm">Período</p>
               <p className="text-xl font-bold">
                 {startDate || endDate ? `R$ ${totalByPeriod.toFixed(2)}` : "—"}
               </p>
             </div>
 
-            <div className="bg-blue-500 text-white p-3 rounded-xl">
+            <div className="bg-pink-400 text-white p-3 rounded-xl">
               <p className="text-sm">Hoje</p>
               <p className="text-xl font-bold">R$ {totalToday.toFixed(2)}</p>
             </div>
 
-            <div className="bg-green-500 text-white p-3 rounded-xl">
+            <div className="bg-pink-600 text-white p-3 rounded-xl">
               <p className="text-sm">Total</p>
               <p className="text-xl font-bold">R$ {totalSalesValue.toFixed(2)}</p>
             </div>
 
-            <div className="bg-yellow-400 text-white p-3 rounded-xl">
+            <div className="bg-pink-300 text-white p-3 rounded-xl">
               <p className="text-sm">Pipocas</p>
               <p className="text-xl font-bold">{totalPipocas}</p>
             </div>
@@ -211,7 +211,7 @@ function SalesPage() {
 
           <button
             onClick={() => setModalOpen(true)}
-            className="w-full sm:w-auto bg-orange-500 text-white py-2 rounded-lg"
+            className="w-full sm:w-auto bg-pink-500 hover:bg-pink-600 text-white py-2 rounded-lg transition"
           >
             Nova venda
           </button>
@@ -219,18 +219,11 @@ function SalesPage() {
 
         {/* FILTROS */}
         <div className="bg-white p-4 rounded-xl shadow mb-4 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3">
-          <input
-            type="text"
-            placeholder="Buscar..."
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            className="border p-2 rounded"
-          />
-
+          <input type="text" placeholder="Buscar..." value={search} onChange={(e) => setSearch(e.target.value)} className="border p-2 rounded" />
           <input type="date" value={startDate} onChange={(e) => setStartDate(e.target.value)} className="border p-2 rounded" />
           <input type="date" value={endDate} onChange={(e) => setEndDate(e.target.value)} className="border p-2 rounded" />
 
-          <button onClick={clearFilters} className="bg-gray-500 text-white rounded">
+          <button onClick={clearFilters} className="bg-pink-200 hover:bg-pink-300 text-pink-800 rounded">
             Limpar
           </button>
         </div>
@@ -261,14 +254,14 @@ function SalesPage() {
                     setEditingSale(sale)
                     setModalOpen(true)
                   }}
-                  className="flex-1 bg-blue-500 text-white py-1 rounded"
+                  className="flex-1 bg-pink-500 hover:bg-pink-600 text-white py-1 rounded"
                 >
                   Editar
                 </button>
 
                 <button
                   onClick={() => deleteSale(sale.id)}
-                  className="flex-1 bg-red-500 text-white py-1 rounded"
+                  className="flex-1 bg-pink-200 hover:bg-pink-300 text-pink-700 py-1 rounded"
                 >
                   Excluir
                 </button>
@@ -284,7 +277,11 @@ function SalesPage() {
             <button
               key={i}
               onClick={() => setCurrentPage(i + 1)}
-              className={`px-3 py-1 rounded ${currentPage === i + 1 ? 'bg-blue-500 text-white' : 'bg-gray-200'}`}
+              className={`px-3 py-1 rounded ${
+                currentPage === i + 1
+                  ? 'bg-pink-500 text-white'
+                  : 'bg-pink-100 text-pink-700'
+              }`}
             >
               {i + 1}
             </button>
