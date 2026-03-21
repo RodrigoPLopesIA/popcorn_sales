@@ -21,6 +21,9 @@ function App() {
   const [sales, setSales] = useState<Sale[]>([])
   const [modalOpen, setModalOpen] = useState(false)
   const [editingSale, setEditingSale] = useState<Sale | null>(null)
+  const [search, setSearch] = useState("")
+  const [startDate, setStartDate] = useState("")
+  const [endDate, setEndDate] = useState("")
 
   // Paginação
   const [currentPage, setCurrentPage] = useState(1)
@@ -42,7 +45,18 @@ function App() {
 
     setSales(list)
   }
+  const totalByPeriod = sales
+    .filter((sale) => {
+      if (!startDate && !endDate) return false
 
+      const saleDate = parseDate(sale.date)
+
+      const matchesStart = startDate ? saleDate >= new Date(startDate) : true
+      const matchesEnd = endDate ? saleDate <= new Date(endDate) : true
+
+      return matchesStart && matchesEnd
+    })
+    .reduce((sum, sale) => sum + sale.total, 0)
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
       setUser(user)
@@ -78,7 +92,7 @@ function App() {
       const username = user.email.split("@")[0].split(".")[0]
       if (!editingSale?.id) return
       const saleDoc = doc(db, "sales", editingSale.id)
-       console.log(`-------- Sale id: ${editingSale.id}`)
+      console.log(`-------- Sale id: ${editingSale.id}`)
       await updateDoc(saleDoc, {
         ...sale,
         user: username,
@@ -97,6 +111,12 @@ function App() {
     loadSales()
   }
 
+  function clearFilters() {
+    setSearch("")
+    setStartDate("")
+    setEndDate("")
+  }
+
   function handleSave(sale: Sale) {
     if (editingSale) updateSale(sale)
     else createSale(sale)
@@ -105,8 +125,41 @@ function App() {
   // Paginação
   const indexOfLastItem = currentPage * itemsPerPage
   const indexOfFirstItem = indexOfLastItem - itemsPerPage
-  const currentSales = sales.slice(indexOfFirstItem, indexOfLastItem)
-  const totalPages = Math.ceil(sales.length / itemsPerPage)
+  function parseDate(dateStr: string) {
+    const [day, month, year] = dateStr.split("/")
+    return new Date(`${year}-${month}-${day}`)
+  }
+
+  const filteredSales = sales
+    .filter((sale) => {
+      const searchLower = search.toLowerCase()
+
+      const matchesSearch =
+        sale.user.toLowerCase().includes(searchLower) ||
+        sale.flavor.toLowerCase().includes(searchLower) ||
+        sale.date.includes(searchLower) ||
+        sale.time.includes(searchLower)
+
+      const saleDate = parseDate(sale.date)
+
+      const matchesStart = startDate ? saleDate >= new Date(startDate) : true
+      const matchesEnd = endDate ? saleDate <= new Date(endDate) : true
+
+      return matchesSearch && matchesStart && matchesEnd
+    })
+    .sort((a, b) => {
+      const dateA = new Date(`${parseDate(a.date)} ${a.time}`)
+      const dateB = new Date(`${parseDate(b.date)} ${b.time}`)
+      return dateB.getTime() - dateA.getTime() // mais recente primeiro
+    })
+  const totalPages = Math.ceil(filteredSales.length / itemsPerPage)
+
+  const currentSales = filteredSales.slice(indexOfFirstItem, indexOfLastItem)
+  const today = new Date().toLocaleDateString("pt-BR")
+
+  const totalToday = sales
+    .filter(sale => sale.date === today)
+    .reduce((sum, sale) => sum + sale.total, 0)
 
   if (loadingAuth) return (
     <div className="flex items-center justify-center min-h-screen">
@@ -125,6 +178,16 @@ function App() {
           <h1 className="text-2xl font-bold">🍿 Controle de Pipoca</h1>
 
           <div className="flex gap-4">
+            <div className="bg-purple-500 text-white p-4 rounded-xl shadow">
+              <p className="text-sm">Vendido no período</p>
+              <p className="text-2xl font-bold">
+                {startDate || endDate ? `R$ ${totalByPeriod.toFixed(2)}` : "—"}
+              </p>
+            </div>
+            <div className="bg-blue-500 text-white p-4 rounded-xl shadow">
+              <p className="text-sm">Vendido hoje</p>
+              <p className="text-2xl font-bold">R$ {totalToday.toFixed(2)}</p>
+            </div>
             <div className="bg-green-500 text-white p-4 rounded-xl shadow">
               <p className="text-sm">Total vendido</p>
               <p className="text-2xl font-bold">R$ {totalSalesValue.toFixed(2)}</p>
@@ -150,7 +213,35 @@ function App() {
             </button>
           </div>
         </div>
+        <div className="bg-white p-4 rounded-xl shadow mb-4 flex flex-col md:flex-row gap-3">
+          <input
+            type="text"
+            placeholder="Buscar..."
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            className="border p-2 rounded w-full"
+          />
 
+          <input
+            type="date"
+            value={startDate}
+            onChange={(e) => setStartDate(e.target.value)}
+            className="border p-2 rounded"
+          />
+
+          <input
+            type="date"
+            value={endDate}
+            onChange={(e) => setEndDate(e.target.value)}
+            className="border p-2 rounded"
+          />
+          <button
+            onClick={clearFilters}
+            className="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600"
+          >
+            Limpar
+          </button>
+        </div>
         {/* TABELA */}
         <div className="bg-white rounded-xl shadow overflow-x-auto">
           <table className="w-full text-sm">
