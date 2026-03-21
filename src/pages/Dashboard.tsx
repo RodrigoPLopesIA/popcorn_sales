@@ -33,11 +33,6 @@ function Dashboard() {
     setSales(list)
   }
 
-  function parseDate(dateStr: string) {
-    const [day, month, year] = dateStr.split("/")
-    return new Date(`${year}-${month}-${day}`)
-  }
-
   // 📊 Últimos 7 dias
   const last7Days = [...Array(7)].map((_, i) => {
     const d = new Date()

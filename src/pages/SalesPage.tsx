@@ -13,8 +13,7 @@ import { auth } from "../services/firebase"
 import Login from "./Login"
 import SaleModal from "../components/SaleModal"
 import type { Sale, SaleInput } from "../types/Sales"
-import { signOut } from "firebase/auth"
-import { Navigate } from "react-router-dom"
+
 
 function SalesPage() {
   const [user, setUser] = useState<User | null>(null)
