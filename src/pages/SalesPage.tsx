@@ -14,6 +14,30 @@ import Login from "./Login"
 import SaleModal from "../components/SaleModal"
 import type { Sale, SaleInput } from "../types/Sales"
 
+async function updateStock(flavor: string, quantityChange: number) {
+  const productsRef = collection(db, "products")
+  const data = await getDocs(productsRef)
+
+  const product = data.docs.find(doc => doc.data().flavor === flavor)
+
+  if (!product) return
+
+
+
+  const productRef = doc(db, "products", product.id)
+
+  const currentQty = product.data().quantity || 0
+  const newQty = currentQty + quantityChange
+  
+  if (newQty < 0) {
+    alert("Estoque insuficiente")
+    return
+  }
+  await updateDoc(productRef, {
+    quantity: newQty
+  })
+}
+
 function SalesPage() {
   const [user, setUser] = useState<User | null>(null)
   const [loadingAuth, setLoadingAuth] = useState(true)
@@ -104,6 +128,9 @@ function SalesPage() {
       time
     })
 
+    // 🔥 NOVO: baixa estoque
+    await updateStock(sale.flavor, -sale.quantity)
+
     loadSales()
   }
 
@@ -123,14 +150,34 @@ function SalesPage() {
       user: username,
     })
 
+    // 🔥 NOVO: controle de estoque
+    if (sale.flavor !== editingSale.flavor) {
+      // devolve antigo
+      await updateStock(editingSale.flavor, editingSale.quantity)
+
+      // remove do novo
+      await updateStock(sale.flavor, -sale.quantity)
+    } else {
+      const diff = sale.quantity - editingSale.quantity
+      await updateStock(sale.flavor, -diff)
+    }
+
     setEditingSale(null)
     loadSales()
   }
 
   async function deleteSale(id?: string) {
     if (!id) return
+
+    const sale = sales.find(s => s.id === id)
+    if (!sale) return
+
     const saleDoc = doc(db, "sales", id)
     await deleteDoc(saleDoc)
+
+    // 🔥 NOVO: devolve estoque
+    await updateStock(sale.flavor, sale.quantity)
+
     loadSales()
   }
 
